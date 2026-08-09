@@ -1,0 +1,78 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - run: uv tool run ruff check .
+      - run: uv tool run ruff format --check .
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - run: uv sync
+      # No test reaches the network: bars are built inline, and the broker adapters
+      # are never constructed. No credentials are needed, by design.
+      - run: uv run pytest
+
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v7
+        with:
+          version: "latest"
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      # Audit the locked dependency set. pip-audit runs in its own isolated tool
+      # environment, so it has to be pointed at an exported requirements file.
+      # tvdatafeed is a git dependency with no PyPI advisory coverage -- see SECURITY.md.
+      - run: uv export --frozen --no-emit-project --format requirements.txt -o requirements.txt
+      - run: uv tool run pip-audit -r requirements.txt
+
+  secrets:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      # A leaked DHAN_ACCESS_TOKEN can place orders against a real account, so the
+      # committed .env.example must never carry a value.
+      - name: .env.example must not carry a secret value
+        run: |
+          # Non-secret defaults like BROKER=dhan are fine; a populated credential is not.
+          if grep -EqI '^[A-Z_]*(TOKEN|SECRET|KEY|PASSWORD|CLIENT_ID|ACCESS|CREDENTIAL)[A-Z_]*=.+' .env.example; then
+            echo "::error file=.env.example::a credential has a value -- secrets belong in .env.local"
+            grep -nEI '^[A-Z_]*(TOKEN|SECRET|KEY|PASSWORD|CLIENT_ID|ACCESS|CREDENTIAL)[A-Z_]*=.+' .env.example
+            exit 1
+          fi
+          echo "OK: .env.example documents credential names only"
+      - name: no .env.local or trade logs committed
+        run: |
+          if git ls-files --error-unmatch .env.local trades/ 2>/dev/null; then
+            echo "::error::.env.local or trades/ is tracked by git"
+            exit 1
+          fi
+          echo "OK: secrets and trade logs untracked"

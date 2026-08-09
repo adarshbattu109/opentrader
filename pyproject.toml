@@ -1,0 +1,64 @@
+[project]
+name = "opentrader"
+version = "0.1.0"
+description = "Trading strategies as JSON, backtested and paper-traded through one engine"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Adarsh Battu", email = "adarsh.battu109@gmail.com" }
+]
+keywords = ["trading", "backtesting", "algorithmic-trading", "nse", "technical-analysis"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Financial and Insurance Industry",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Office/Business :: Financial :: Investment",
+]
+requires-python = ">=3.14"
+dependencies = [
+    "dhanhq>=2.2.0",
+    "fastapi>=0.141.1",
+    "inquirerpy>=0.3.4",
+    "pandas>=3.0.5",
+    "tvdatafeed",
+    "uvicorn>=0.52.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/adarshbattu109/opentrader"
+Issues = "https://github.com/adarshbattu109/opentrader/issues"
+
+[project.scripts]
+opentrader = "cli.dispatch:main"
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+extend-exclude = ["docs"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[build-system]
+requires = ["uv_build>=0.12.3,<0.13.0"]
+build-backend = "uv_build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+# tvdatafeed's regex literals are not raw strings, and starlette's TestClient
+# warns about its own httpx pin. Neither is ours to fix.
+filterwarnings = [
+    "ignore::SyntaxWarning",
+    "ignore:Using `httpx` with `starlette.testclient`:DeprecationWarning",
+]
+
+[tool.uv.sources]
+tvdatafeed = { git = "https://github.com/rongardF/tvDatafeed" }
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "pytest>=9.1.1",
+]

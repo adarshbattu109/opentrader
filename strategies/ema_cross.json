@@ -1,0 +1,12 @@
+{
+  "name": "ema_cross_poc",
+  "symbol": "RELIANCE",
+  "exchange": "NSE",
+  "indicators": [
+    {"id": "ema9",  "type": "ema", "period": 9},
+    {"id": "ema21", "type": "ema", "period": 21}
+  ],
+  "entry": {"left": "ema9", "op": "crosses_above", "right": "ema21"},
+  "stop_loss_pct": 1.5,
+  "risk_reward_ratio": 3.0
+}

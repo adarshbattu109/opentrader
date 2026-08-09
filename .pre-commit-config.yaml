@@ -1,0 +1,29 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-json
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      # A committed .env.local or trades/*.csv from a real account is the failure
+      # mode this repo cares most about. .gitignore covers it; this is the backstop.
+      - id: detect-private-key
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.14.4
+    hooks:
+      - id: ruff-check
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: local
+    hooks:
+      - id: env-example-no-secret-values
+        name: .env.example must not carry a secret value
+        entry: bash -c 'grep -EHn "^[A-Z_]*(TOKEN|SECRET|KEY|PASSWORD|CLIENT_ID|ACCESS|CREDENTIAL)[A-Z_]*=.+" .env.example && exit 1 || exit 0'
+        language: system
+        files: ^\.env\.example$
+        pass_filenames: false

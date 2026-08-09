@@ -1,0 +1,11 @@
+{
+  "name": "rsi_oversold_poc",
+  "symbol": "INFY",
+  "exchange": "NSE",
+  "indicators": [
+    {"id": "rsi14", "type": "rsi", "period": 14}
+  ],
+  "entry": {"left": "rsi14", "op": "crosses_above", "right": 30},
+  "stop_loss_pct": 2.0,
+  "risk_reward_ratio": 2.0
+}

@@ -1,0 +1,11 @@
+{
+  "name": "price_above_ema_poc",
+  "symbol": "TCS",
+  "exchange": "NSE",
+  "indicators": [
+    {"id": "ema50", "type": "ema", "period": 50}
+  ],
+  "entry": {"left": "close", "op": "crosses_above", "right": "ema50"},
+  "stop_loss_pct": 1.0,
+  "risk_reward_ratio": 4.0
+}
