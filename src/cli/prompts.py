@@ -52,16 +52,14 @@ def build_argv(answers: dict) -> list[str]:
         # The UI picks its own strategy from a menu, so it takes no path here.
         return ["opentrader", "--port", str(answers["port"])]
 
-    argv = ["opentrader", answers["strategy"]]
+    argv = ["opentrader", answers["strategy"], "--interval", answers["interval"]]
     if answers["mode"] == "backtest":
-        argv += ["--interval", answers["interval"], "--bars", str(answers["bars"])]
-    else:
-        argv += ["--interval", answers["interval"], "--source", answers["source"]]
-        if answers.get("once"):
-            argv.append("--once")
-        else:
-            argv += ["--poll", str(answers["poll"])]
-    return argv
+        return argv + ["--bars", str(answers["bars"])]
+
+    argv += ["--source", answers["source"]]
+    if answers.get("once"):
+        return argv + ["--once"]
+    return argv + ["--poll", str(answers["poll"])]
 
 
 def ask() -> dict:
@@ -74,10 +72,14 @@ def ask() -> dict:
             Choice("backtest", name="backtest   replay historical bars"),
             Choice("live", name="live       poll a live feed (mock orders only)"),
             Choice("serve", name="serve      open the chart UI in a browser"),
+            Choice("quit", name="quit       exit"),
         ],
         default="backtest",
-        instruction="(arrows to move, enter to pick)",
+        instruction="(arrows to move, enter to pick, ctrl-c to quit)",
     ).execute()
+
+    if answers["mode"] == "quit":
+        return answers
 
     if answers["mode"] == "serve":
         answers["port"] = inquirer.number(
@@ -157,6 +159,8 @@ def main() -> None:
         sys.exit("\ncancelled.")
     if not answers.get("mode"):
         sys.exit("cancelled.")
+    if answers["mode"] == "quit":
+        return
     if answers["mode"] != "serve" and not answers.get("strategy"):
         sys.exit("cancelled.")
 

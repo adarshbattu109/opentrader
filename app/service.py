@@ -124,16 +124,18 @@ def chart_payload(df: pd.DataFrame, strat: dict, ledger: MockLedger, interval: s
             },
         ]
 
-    still_open = [
-        {
-            "entry_time": to_ts(p.entry_time),
-            "entry_price": str(p.entry_price),
-            "stop_loss": str(p.stop_loss),
-            "target": str(p.target),
-        }
-        for p in ledger.open.values()
-    ]
+    # A position the run never closed still has to render: it gets a row and an
+    # entry marker, but no exit and no won/lost verdict.
+    still_open = []
     for pos in ledger.open.values():
+        still_open.append(
+            {
+                "entry_time": to_ts(pos.entry_time),
+                "entry_price": str(pos.entry_price),
+                "stop_loss": str(pos.stop_loss),
+                "target": str(pos.target),
+            }
+        )
         markers.append(
             {
                 "time": to_ts(pos.entry_time),

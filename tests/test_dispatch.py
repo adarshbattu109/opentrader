@@ -89,6 +89,17 @@ def test_picker_modes_match_the_dispatch_targets():
     assert prompts.MODES["live"] == dispatch.COMMANDS["live"][0]
 
 
+def test_quit_leaves_the_picker_without_launching_a_driver(monkeypatch):
+    """The menu's exit choice has no driver -- it must return, not KeyError on MODES."""
+    launched = []
+    monkeypatch.setattr(prompts, "ask", lambda: {"mode": "quit"})
+    monkeypatch.setattr("importlib.import_module", lambda m: launched.append(m))
+
+    prompts.main()  # a deliberate quit is exit 0, not SystemExit("cancelled.")
+
+    assert launched == [], "quit must not import a driver"
+
+
 # build_argv is the whole TUI-to-CLI contract: answers in, the exact command line
 # the driver's argparse would have seen out. Pure, so it needs no prompts.
 
