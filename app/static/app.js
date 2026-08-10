@@ -149,19 +149,32 @@ function setError(message) {
 function pad(n) { return String(n).padStart(2, "0"); }
 
 /* Money arrives as an exact decimal string -- the server deliberately does not
-   round (app/service.py), so the trade column always sums to the summary. The
-   cost is exponent noise: 55.8810 next to 17.772750 next to -20.00.
+   round (app/service.py). Display rounds to a fixed 2dp so the column reads as
+   money rather than as exponent noise.
 
-   Trim the padding zeros, never the value. Rounding here would be the one
-   change that breaks the sum, and a verification UI that quietly drops a digit
-   is worse than an untidy one. Two decimals minimum so it still reads as money;
-   anything longer is real precision, not padding. */
+   Consequence, deliberate: the displayed column no longer necessarily sums to
+   the displayed NET. Sub-cent P&L is rounded away in both places independently,
+   so they can disagree by a cent or two. The payload stays exact; only the
+   pixels round.
+
+   Half-up on the digit string, not via toFixed(): toFixed rounds a float, and
+   (1.005).toFixed(2) is "1.00". Exact input deserves an exact round. */
 function money(s) {
   if (s == null) return "—";
   const str = String(s);
   if (!/^-?\d+(\.\d+)?$/.test(str)) return str;
-  const [whole, frac = ""] = str.split(".");
-  return whole + "." + frac.replace(/0+$/, "").padEnd(2, "0");
+  const neg = str[0] === "-";
+  const [whole, frac = ""] = (neg ? str.slice(1) : str).split(".");
+  let out;
+  if (frac.length <= 2) {
+    out = whole + "." + frac.padEnd(2, "0");
+  } else {
+    const cents = String(Number(whole + frac.slice(0, 2)) + (frac[2] >= "5" ? 1 : 0));
+    const d = cents.padStart(3, "0");
+    out = d.slice(0, -2) + "." + d.slice(-2);
+  }
+  // -0.00 is not a number anyone wants to read.
+  return (neg && /[1-9]/.test(out) ? "-" : "") + out;
 }
 
 function formatTime(t) {
