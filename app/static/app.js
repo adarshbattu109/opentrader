@@ -148,6 +148,22 @@ function setError(message) {
 
 function pad(n) { return String(n).padStart(2, "0"); }
 
+/* Money arrives as an exact decimal string -- the server deliberately does not
+   round (app/service.py), so the trade column always sums to the summary. The
+   cost is exponent noise: 55.8810 next to 17.772750 next to -20.00.
+
+   Trim the padding zeros, never the value. Rounding here would be the one
+   change that breaks the sum, and a verification UI that quietly drops a digit
+   is worse than an untidy one. Two decimals minimum so it still reads as money;
+   anything longer is real precision, not padding. */
+function money(s) {
+  if (s == null) return "—";
+  const str = String(s);
+  if (!/^-?\d+(\.\d+)?$/.test(str)) return str;
+  const [whole, frac = ""] = str.split(".");
+  return whole + "." + frac.replace(/0+$/, "").padEnd(2, "0");
+}
+
 function formatTime(t) {
   const d = new Date(t * 1000);
   return d.getUTCFullYear() + "-" + pad(d.getUTCMonth() + 1) + "-" + pad(d.getUTCDate()) +
@@ -417,7 +433,7 @@ function setSummary(s) {
   el.sumClosed.textContent = s.closed;
   el.sumWins.textContent = s.wins;
   el.sumLosses.textContent = s.losses;
-  el.sumNet.textContent = s.net;
+  el.sumNet.textContent = money(s.net);
   el.sumOpen.textContent = s.open;
 }
 
@@ -452,11 +468,11 @@ function renderTrades(r) {
     tr.innerHTML =
       cell("i", String(i + 1)) +
       cell("t", formatTime(t.entry_time)) +
-      cell("n", t.entry_price) +
+      cell("n", esc(money(t.entry_price))) +
       cell("t", formatTime(t.exit_time)) +
-      cell("n", t.exit_price) +
+      cell("n", esc(money(t.exit_price))) +
       cell("n", '<span class="reason ' + reasonCls + '">' + esc(t.exit_reason) + "</span>") +
-      cell("n pnl " + (t.won ? "win" : "loss"), esc(t.pnl)) +
+      cell("n pnl " + (t.won ? "win" : "loss"), esc(money(t.pnl))) +
       cell("f", t.straddle
         ? '<span class="flag" tabindex="0" aria-label="straddle bar">⚠</span>'
         : "");
@@ -480,7 +496,7 @@ function renderTrades(r) {
     tr.innerHTML =
       cell("i", String(r.trades.length + i + 1)) +
       cell("t", formatTime(o.entry_time)) +
-      cell("n", o.entry_price) +
+      cell("n", esc(money(o.entry_price))) +
       cell("t", "—") +
       cell("n", "—") +
       cell("n", '<span class="reason">open</span>') +
