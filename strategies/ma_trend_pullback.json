@@ -1,0 +1,13 @@
+{
+  "name": "ma_trend_pullback_poc",
+  "symbol": "RELIANCE",
+  "exchange": "NSE",
+  "indicators": [
+    {"id": "sma20", "type": "sma", "period": 20},
+    {"id": "sma50", "type": "sma", "period": 50},
+    {"id": "rsi21", "type": "rsi", "period": 21}
+  ],
+  "entry": {"left": "close", "op": "crosses_above", "right": "sma20"},
+  "stop_loss_pct": 2.0,
+  "risk_reward_ratio": 2.75
+}

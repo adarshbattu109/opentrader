@@ -10,6 +10,11 @@ def ema(s: pd.Series, period: int) -> pd.Series:
     return s.ewm(span=period, adjust=False).mean()
 
 
+def sma(s: pd.Series, period: int) -> pd.Series:
+    """Simple moving average. NaN until `period` bars exist, unlike ema()."""
+    return s.rolling(period).mean()
+
+
 def rsi(s: pd.Series, period: int = 14) -> pd.Series:
     """Wilder's RSI (smoothing alpha = 1/period, not a simple rolling mean)."""
     delta = s.diff()

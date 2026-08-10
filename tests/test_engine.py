@@ -39,6 +39,17 @@ def test_ema_matches_manual():
     assert abs(got.iloc[2] - 2.555556) < 1e-5, got.iloc[2]
 
 
+def test_sma_is_a_flat_mean_and_nan_before_the_window_fills():
+    """Unlike ema(), sma() emits nothing until `period` bars exist."""
+    got = compute_indicators(
+        _bars([(1, 1, 1, 1), (2, 2, 2, 2), (3, 3, 3, 3)]),
+        {"indicators": [{"id": "s", "type": "sma", "period": 2}]},
+    )["s"]
+    assert pd.isna(got.iloc[0]), "one bar cannot fill a 2-bar window"
+    assert got.iloc[1] == 1.5
+    assert got.iloc[2] == 2.5
+
+
 def test_stop_and_target_prices():
     """Entry 100, sl 2% -> stop 98, risk 2, R:R 3 -> target 106."""
     led = MockLedger()

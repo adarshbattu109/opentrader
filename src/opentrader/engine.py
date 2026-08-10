@@ -14,7 +14,7 @@ import pandas as pd
 from . import conditions, indicators
 from .mock_ledger import MockLedger
 
-INDICATORS = {"ema": indicators.ema, "rsi": indicators.rsi}
+INDICATORS = {"ema": indicators.ema, "rsi": indicators.rsi, "sma": indicators.sma}
 OPS = {
     "crosses_above": conditions.crosses_above,
     "crosses_below": conditions.crosses_below,
