@@ -213,7 +213,7 @@ wheels = [
 
 [[package]]
 name = "dhanhq"
-version = "2.2.0"
+version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pandas" },
@@ -221,9 +221,9 @@ dependencies = [
     { name = "requests" },
     { name = "websockets" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d3/89/b8d5f00e8636abbbd975d98d68e46b990e710579508bf351406aaf1fc177/dhanhq-2.2.0.tar.gz", hash = "sha256:b1836107111c48923ce455303b1cd29a85de97667e109f2bbf1cb25bfccecb52", size = 44814, upload-time = "2026-04-24T11:42:05.345Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/cb/d9/9910974c44b3fe6e12a992207211f56a426b0b9927c651378d9c29e4d405/dhanhq-2.3.0.tar.gz", hash = "sha256:9eb90268168704a33b0a8d7d3bcb34920380319c1cadd4bf75c04078e90f4451", size = 56627, upload-time = "2026-10-08T14:40:32.087Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/62/2e/27eeb5c3f8eaf6dc0f39723cefb904d597382dbd0011aff34b3bb287600b/dhanhq-2.2.0-py3-none-any.whl", hash = "sha256:0469dc83317dbeeec4990fa249a583157373a91bde1c4738e5ab91313a952f6b", size = 36510, upload-time = "2026-04-24T11:42:04.041Z" },
+    { url = "https://files.pythonhosted.org/packages/7a/a5/a11752cd0f8472f18d84b0cd1f22efe7e903c8654e573e55237f6851a6c1/dhanhq-2.3.0-py3-none-any.whl", hash = "sha256:5d8f841f6e854e6bbfa62fe7ff7d1b1ddca771249e37b64c688373980dcd7462", size = 45243, upload-time = "2026-10-08T14:40:30.916Z" },
 ]
 
 [[package]]
